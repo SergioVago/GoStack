@@ -15,8 +15,5 @@ export function helloWorld(request: Request, response: Response) {
     anotherTechs: ['Reactjs', 'Reactjs', 'Reactjs', 'Reactjs']
   })
 
-  console.log(user.);
-
-
   return response.json({ message: 'Hello World' })
 }
