@@ -4,6 +4,7 @@ import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
 
+import { useAuth } from '../../hooks/AuthContext';
 import getValidationErros from '../../utils/getValidationErrors';
 
 import logoImg from '../../assets/logo.svg';
@@ -13,30 +14,45 @@ import Button from '../../components/Button';
 
 import { Container, Content, Background } from './styles';
 
+interface SingInFormData {
+  email: string;
+  password: string;
+}
+
 const SignIn: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
 
-  const handleSubmit = useCallback(async (data: object) => {
-    try {
-      formRef.current?.setErrors({});
+  const { user, singIn } = useAuth();
 
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('E-mail obrigatório')
-          .email('Digite um e-mail válido'),
-        password: Yup.string().required('Senha obrigatória'),
-      });
+  const handleSubmit = useCallback(
+    async (data: SingInFormData) => {
+      try {
+        formRef.current?.setErrors({});
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
-    } catch (err) {
-      const erros = getValidationErros(err);
-      formRef.current?.setErrors(erros);
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().required('Senha obrigatória'),
+        });
 
-      console.log('err :>> ', err);
-    }
-  }, []);
+        await schema.validate(data, {
+          abortEarly: false,
+        });
+
+        singIn({
+          email: data.email,
+          password: data.password,
+        });
+      } catch (err) {
+        const erros = getValidationErros(err);
+        formRef.current?.setErrors(erros);
+
+        console.log('err :>> ', err);
+      }
+    },
+    [singIn],
+  );
 
   return (
     <Container>
