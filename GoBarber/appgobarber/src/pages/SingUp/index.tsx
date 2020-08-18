@@ -14,6 +14,7 @@ import * as Yup from 'yup';
 
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/mobile';
+import api from '../../services/api';
 
 import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
@@ -57,9 +58,12 @@ const SingUp: React.FC = () => {
           abortEarly: false,
         });
 
-        // await api.post('/users', data);
+        await api.post('/users', data);
 
-        // history.push('/');
+        Alert.alert('Cadastro Realizado com sucesso!',
+          'Você já pode fazer login na aplicação');
+
+        navigation.goBack();
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const erros = getValidationErros(err);
