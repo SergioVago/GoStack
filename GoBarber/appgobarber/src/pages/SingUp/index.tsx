@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useRef } from 'react';
+import React, { useRef, useCallback } from 'react';
 import {
   Image,
   KeyboardAvoidingView,
@@ -7,8 +7,10 @@ import {
   ScrollView,
   View,
   TextInput,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import * as Yup from 'yup';
 
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/mobile';
@@ -17,11 +19,19 @@ import logoImg from '../../assets/logo.png';
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
+import getValidationErros from '../../utils/getValidationErrors';
+
 import {
   BackToSingIn,
   BackToSingInText, Container,
   Title,
 } from './styles';
+
+interface SignUpFormData {
+  name: string;
+  email: string;
+  password: string;
+}
 
 const SingUp: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
@@ -29,6 +39,44 @@ const SingUp: React.FC = () => {
 
   const emailInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
+
+  const handleSingUp = useCallback(
+    async (data: SignUpFormData) => {
+      try {
+        formRef.current?.setErrors({});
+
+        const schema = Yup.object().shape({
+          name: Yup.string().required('Nome obrigatório'),
+          email: Yup.string()
+            .required('E-mail obrigatório')
+            .email('Digite um e-mail válido'),
+          password: Yup.string().min(6, 'No mínimo 6 dígitos'),
+        });
+
+        await schema.validate(data, {
+          abortEarly: false,
+        });
+
+        // await api.post('/users', data);
+
+        // history.push('/');
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const erros = getValidationErros(err);
+
+          formRef.current?.setErrors(erros);
+
+          return;
+        }
+
+        Alert.alert(
+          'Erro na autenticação',
+          'Ocorreu um erro ao fazer o cadastro, tente novamente',
+        );
+      }
+    },
+    [],
+  );
 
   return (
     <>
@@ -49,9 +97,7 @@ const SingUp: React.FC = () => {
 
             <Form
               ref={formRef}
-              onSubmit={(data) => {
-                console.log(data);
-              }}
+              onSubmit={handleSingUp}
               style={{ width: '100%' }}
             >
               <Input
