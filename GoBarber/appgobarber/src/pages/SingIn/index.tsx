@@ -8,6 +8,8 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 
+import { useAuth } from '../../hooks/auth';
+
 import getValidationErros from '../../utils/getValidationErrors';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -34,6 +36,8 @@ const SingIn: React.FC = () => {
 
   const navigation = useNavigation();
 
+  const { singIn } = useAuth();
+
   const handleSingIn = useCallback(
     async (data: SingInFormData) => {
       try {
@@ -50,10 +54,10 @@ const SingIn: React.FC = () => {
           abortEarly: false,
         });
 
-        // await singIn({
-        //   email: data.email,
-        //   password: data.password,
-        // });
+        await singIn({
+          email: data.email,
+          password: data.password,
+        });
 
         // history.push('/dashboard');
       } catch (err) {
@@ -69,7 +73,7 @@ const SingIn: React.FC = () => {
           'Ocorreu um erro ao fazer login, cheque as credenciais');
       }
     },
-    [],
+    [singIn],
   );
 
   return (
