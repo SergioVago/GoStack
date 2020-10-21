@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 class AppError {
   public readonly message: string;
 
