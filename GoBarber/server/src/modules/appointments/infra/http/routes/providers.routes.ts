@@ -25,6 +25,11 @@ providersRoutes.get(
 );
 providersRoutes.get(
   '/:provider_id/day-availability',
+  celebrate({
+    [Segments.PARAMS]: {
+      provider_id: Joi.string().uuid().required(),
+    },
+  }),
   providerDayAvailabilityController.index,
 );
 
